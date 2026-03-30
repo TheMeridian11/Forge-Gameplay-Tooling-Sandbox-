@@ -1,0 +1,39 @@
+name: CMake CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks out your repository so the workflow can access your code.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Installs the system packages needed to configure and build the project.
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            libsdl2-dev \
+            nlohmann-json3-dev \
+            catch2
+
+      # Configures the project and generates build files in the build/ directory.
+      - name: Configure CMake
+        run: cmake -B build -S .
+
+      # Builds the main application and test executable.
+      - name: Build project
+        run: cmake --build build
+
+      # Runs the discovered test suite through CTest.
+      - name: Run tests
+        run: ctest --test-dir build --output-on-failure
