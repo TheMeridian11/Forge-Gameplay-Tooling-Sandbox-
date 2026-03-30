@@ -39,3 +39,10 @@
 
 # debug information files
 *.dwo
+
+
+# below is the stuff i have added myself
+/build/
+/out/
+/external/imgui.ini
+imgui.ini
