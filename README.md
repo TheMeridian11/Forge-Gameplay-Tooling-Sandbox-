@@ -72,7 +72,7 @@ From the project root:
 > ctest --test-dir build --output-on-failure
 
 ## Notes:
--The current version is an early foundation build.
--Gameplay systems have not been implemented yet.
--The focus so far has been on creating a clean, professional starting point for future development.
+- The current version is an early foundation build.
+- Gameplay systems have not been implemented yet.
+- The focus so far has been on creating a clean, professional starting point for future development.
 
