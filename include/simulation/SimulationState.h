@@ -22,6 +22,11 @@
 // For phase 2, it mainly stores units and allows new ones to be added. 
 class SimulationState {
     public:
+
+    // creates a starter simulation state with a few built in sample units.
+    // This is useful during early development before JSON-driven loading exists.
+    static SimulationState createSampleState();
+
     // Adds a unit into the simulation
     void addUnit(const Unit& unit);
 

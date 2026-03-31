@@ -87,29 +87,7 @@ int main(int argc, char* argv[]) {
 
     // PHASE 2
     // Create the first simulation state for the sandbox.
-    SimulationState simulation_state;
-
-    // Add a few sample units so the sandbox has real internal data.
-    simulation_state.addUnit(Unit{
-        .id = 1,
-        .name = "Knight",
-        .team = Team::Blue,
-        .stats = Stats{150, 150, 20}
-    });
-
-    simulation_state.addUnit(Unit{
-        .id = 2,
-        .name = "Mage",
-        .team = Team::Red,
-        .stats = Stats{200, 200, 40}
-    });
-
-    simulation_state.addUnit(Unit{
-        .id = 3,
-        .name = "Archer",
-        .team = Team::Blue,
-        .stats = Stats{100, 100, 15}
-    });
+    SimulationState simulation_state = SimulationState::createSampleState();
 
 
 
