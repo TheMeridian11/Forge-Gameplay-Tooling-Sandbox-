@@ -44,6 +44,7 @@ set(IMGUI_SOURCES
 # This is essentially our actual application.
 add_executable(forge_gameplay_tooling_sandbox
     src/main.cpp
+    src/simulation/SimulationState.cpp
     ${IMGUI_SOURCES}
 )
 
