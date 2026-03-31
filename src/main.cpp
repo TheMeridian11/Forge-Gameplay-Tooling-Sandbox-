@@ -3,10 +3,25 @@
 
 #include <SDL2/SDL.h>
 #include <iostream>
+#include <string>
 
 #include "imgui.h"
 #include "backends/imgui_impl_sdl2.h"
 #include "backends/imgui_impl_sdlrenderer2.h"
+#include "simulation/SimulationState.h"
+
+// PHASE 2
+// Converts a team enum value into readable text for the UI.
+const char* teamToString(Team team) {
+    switch (team) {
+        case Team::Blue:
+            return "Blue";
+        case Team::Red:
+            return "Red";
+        default:
+            return "Unknown";
+    }
+}
 
 int main(int argc, char* argv[]) {
     // we silence warning when these parameters remain unused
@@ -33,7 +48,7 @@ int main(int argc, char* argv[]) {
         SDL_WINDOW_SHOWN
     );
 
-    if (!window) {
+    if (window == nullptr) {
         std::cerr << "SDL_CreateWindow failed: " << SDL_GetError() << '\n';
         SDL_Quit();
         return 1;
@@ -50,7 +65,7 @@ int main(int argc, char* argv[]) {
         SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
     );
 
-    if (!renderer) {
+    if (renderer == nullptr) {
         std::cerr << "SDL_CreateRenderer failed: " << SDL_GetError() << '\n';
         SDL_DestroyWindow(window);
         SDL_Quit();
@@ -61,10 +76,6 @@ int main(int argc, char* argv[]) {
     IMGUI_CHECKVERSION();
     // creating the imgui context
     ImGui::CreateContext();
-    // getting the imgui i/o object
-    ImGuiIO& io = ImGui::GetIO();
-    (void)io;
-
     // just setting a dark theme
     ImGui::StyleColorsDark();
 
@@ -74,11 +85,39 @@ int main(int argc, char* argv[]) {
     ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
     ImGui_ImplSDLRenderer2_Init(renderer);
 
+    // PHASE 2
+    // Create the first simulation state for the sandbox.
+    SimulationState simulation_state;
+
+    // Add a few sample units so the sandbox has real internal data.
+    simulation_state.addUnit(Unit{
+        .id = 1,
+        .name = "Knight",
+        .team = Team::Blue,
+        .stats = Stats{150, 150, 20}
+    });
+
+    simulation_state.addUnit(Unit{
+        .id = 2,
+        .name = "Mage",
+        .team = Team::Red,
+        .stats = Stats{200, 200, 40}
+    });
+
+    simulation_state.addUnit(Unit{
+        .id = 3,
+        .name = "Archer",
+        .team = Team::Blue,
+        .stats = Stats{100, 100, 15}
+    });
+
+
+
     bool running = true;
     // This is the loop that will be keeping our application alive, running every frame until 
     // the user closes the window.
     while (running == true) {
-        // Event handling
+        // Window event handling and processing inputs
         // checking for things like window closing, keyboard input, mouse input
         // we also send SDL events into ImGui too.
         SDL_Event event;
@@ -97,12 +136,25 @@ int main(int argc, char* argv[]) {
         ImGui::NewFrame();
 
         // Drawing a simple debug window
-        // particularly, we are creating a little UI panel that proves ImGui is rendering.
-        ImGui::Begin("Forge Debug");
-        ImGui::Text("Week 1 setup is working.");
+        // ̶p̶a̶r̶t̶i̶c̶u̶l̶a̶r̶l̶y̶,̶ ̶w̶e̶ ̶a̶r̶e̶ ̶c̶r̶e̶a̶t̶i̶n̶g̶ ̶a̶ ̶l̶i̶t̶t̶l̶e̶ ̶U̶I̶ ̶p̶a̶n̶e̶l̶ ̶t̶h̶a̶t̶ ̶p̶r̶o̶v̶e̶s̶ ̶I̶m̶G̶u̶i̶ ̶i̶s̶ ̶r̶e̶n̶d̶e̶r̶i̶n̶g̶.̶
+        // This window will be showing the current simulation state.
+        ImGui::Begin("Simulation Overview");
+        ImGui::Text("week 2 setup: Core simulation foundation");
         ImGui::Text("SDL2 window and Dear ImGui are running!");
         ImGui::Separator();
-        ImGui::Text("Next: smoke test and first successful build, lol memes");
+        ImGui::Text("Total Units: %zu",  simulation_state.getUnitCount());
+
+        const std::vector<Unit>& units = simulation_state.getUnits();
+
+        for (const Unit& unit : units) {
+            ImGui::Separator();
+            ImGui::Text("Unit ID: %d", unit.id);
+            ImGui::Text("Name: %s", unit.name.c_str());
+            ImGui::Text("Team: %s", teamToString(unit.team));
+            ImGui::Text("Health: %d / %d", unit.stats.current_health, unit.stats.max_health);
+            ImGui::Text("Attack Power: %d", unit.stats.attack_power);
+        }
+        //ImGui::Text("Next: smoke test and first successful build, lol memes");
         ImGui::End();
 
         // Now we actually render everything.
@@ -123,6 +175,7 @@ int main(int argc, char* argv[]) {
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
     
+    // releasing sdl resources
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
