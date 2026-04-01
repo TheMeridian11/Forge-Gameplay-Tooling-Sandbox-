@@ -17,6 +17,9 @@
 // (3) getUnits() const:
 // The member fucntion itself is read only with respect to the object 
 
+// PHASE 2 CONTINUATION:
+// this is a new system i want to introduce which is a tick system that updates system code with each frame
+
 
 // Holds the current state of the sandbox simulation
 // For phase 2, it mainly stores units and allows new ones to be added. 
