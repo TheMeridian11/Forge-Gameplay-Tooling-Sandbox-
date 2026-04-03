@@ -89,7 +89,11 @@ int main(int argc, char* argv[]) {
     // Create the first simulation state for the sandbox.
     SimulationState simulation_state = SimulationState::createSampleState();
 
-
+    // Track frame timing so we can compute delta time each update
+    // SDL_GetPerformanceCounter() provides us a high precision timer value.
+    Uint64 previousCounter = SDL_GetPerformanceCounter();
+    // the frequency function tells us how many timer counts happen per second.
+    const Uint64 frequency = SDL_GetPerformanceFrequency();
 
     bool running = true;
     // This is the loop that will be keeping our application alive, running every frame until 
@@ -107,6 +111,22 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        // Calculate frame delta time in seconds.
+        const Uint64 currentCounter = SDL_GetPerformanceCounter();
+        // here we subtract to obtain how much time passed between frames.
+        const Uint64 counterElapsed = currentCounter - previousCounter;
+        previousCounter = currentCounter;
+
+        // using the frequency function before hand, this division gives us frame time in seconds.
+        // NOTE: The reasoning for using delta time:
+        // because simulations should update based on "time passed", not just blindly assume each frame is equal.
+        // Later this will matter for things like cooldown timers, effect durations, movement and combat timing. 
+        // so i thought it would be a good idea to start this right habit from now in development.  
+        const float deltaTimeSeconds = static_cast<float>(counterElapsed) / static_cast<float>(frequency);
+
+        // Advance the simulation. 
+        simulation_state.update(deltaTimeSeconds);
+
         // Starting a new ImGui Frame
         // we are telling imgui here to build a new frame of UI
         ImGui_ImplSDLRenderer2_NewFrame();
@@ -121,6 +141,8 @@ int main(int argc, char* argv[]) {
         ImGui::Text("SDL2 window and Dear ImGui are running!");
         ImGui::Separator();
         ImGui::Text("Total Units: %zu",  simulation_state.getUnitCount());
+        ImGui::Text("Tick Count: %zu", simulation_state.getTickCount());
+        ImGui::Text("Elapsed Time: %.2f seconds", simulation_state.getElapsedTimeSeconds());
 
         const std::vector<Unit>& units = simulation_state.getUnits();
 
