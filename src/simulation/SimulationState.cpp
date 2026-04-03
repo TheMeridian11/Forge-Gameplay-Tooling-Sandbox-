@@ -29,6 +29,13 @@ SimulationState SimulationState::createSampleState() {
     return state;
 }
 
+// Advances the simulation by one update step.
+// For now, this only tracks time and tick count.
+// Later this function will also drive gameplay systems. 
+void SimulationState::update(float deltaTimeSeconds) {
+    ++m_tickCount;
+    m_elapsedTimeSeconds += deltaTimeSeconds;
+}
 
 // Adds a unit to the internal unit list
 void SimulationState::addUnit(const Unit& unit) {
@@ -43,5 +50,15 @@ const std::vector<Unit>& SimulationState::getUnits() const {
 // Returns the number of units currently stored in the simulation.
 std::size_t SimulationState::getUnitCount() const {
     return m_units.size();
+}
+
+// Returns the number of simulation ticks that have occured.
+std::size_t SimulationState::getTickCount() const {
+    return m_tickCount;
+}
+
+// Returns the total elapsed simulation time in seconds.
+float SimulationState::getElapsedTimeSeconds() const {
+    return m_elapsedTimeSeconds;
 }
 
