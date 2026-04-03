@@ -23,6 +23,14 @@ const char* teamToString(Team team) {
     }
 }
 
+// Converts pause state into readable text for the UI.
+const char* simulationStatusToString(bool isPaused) {
+    if (isPaused == true) {
+        return "Paused";
+    }
+    return "Running";
+}
+
 int main(int argc, char* argv[]) {
     // we silence warning when these parameters remain unused
     (void)argc;
@@ -140,9 +148,22 @@ int main(int argc, char* argv[]) {
         ImGui::Text("week 2 setup: Core simulation foundation");
         ImGui::Text("SDL2 window and Dear ImGui are running!");
         ImGui::Separator();
+        ImGui::Text("Status: %s", simulationStatusToString(simulation_state.isPaused()));
         ImGui::Text("Total Units: %zu",  simulation_state.getUnitCount());
         ImGui::Text("Tick Count: %zu", simulation_state.getTickCount());
         ImGui::Text("Elapsed Time: %.2f seconds", simulation_state.getElapsedTimeSeconds());
+
+        ImGui::Spacing();
+
+        if (simulation_state.isPaused()) {
+            if (ImGui::Button("Resume Simulation")) {
+                simulation_state.resume();
+            }
+        } else {
+            if (ImGui::Button("Pause Simulation")) {
+                simulation_state.pause();
+            }
+        }
 
         const std::vector<Unit>& units = simulation_state.getUnits();
 
