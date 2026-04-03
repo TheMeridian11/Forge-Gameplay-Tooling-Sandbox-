@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <vector>
 
 #include "gameplay/Unit.h"
@@ -34,6 +35,18 @@ class SimulationState {
     // (will be called from main.cpp every frame)
     void update(float deltaTimeSeconds);
 
+    // Pauses the simulation updates.
+    void pause();
+
+    // Resumes the simulation updates.
+    void resume();
+
+    // Toggles between paused and runnin states.
+    void togglePaused();
+
+    // Return whether the simulation is currently paused or not.
+    bool isPaused() const;
+
     // Adds a unit into the simulation
     void addUnit(const Unit& unit);
 
@@ -61,4 +74,6 @@ class SimulationState {
     // Tracks the total elapsed simulation time.
     float m_elapsedTimeSeconds = 0.0f;
 
+    // Controls whether the simulation is currently paused or not.
+    bool m_isPaused = false;
 };

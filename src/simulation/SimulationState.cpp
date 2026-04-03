@@ -30,11 +30,39 @@ SimulationState SimulationState::createSampleState() {
 }
 
 // Advances the simulation by one update step.
-// For now, this only tracks time and tick count.
+// For now, this only tracks time and tick count and pausing support.
 // Later this function will also drive gameplay systems. 
 void SimulationState::update(float deltaTimeSeconds) {
+    // if the simulation is paused, no time or tick progress occurs.
+    if (m_isPaused == true) {
+        return;
+    }
+    
     ++m_tickCount;
     m_elapsedTimeSeconds += deltaTimeSeconds;
+}
+
+// Pauses the simulation
+void SimulationState::pause() {
+    m_isPaused = true;
+}
+
+// Resume the simulation.
+void SimulationState::resume() {
+    m_isPaused = false;
+}
+
+// Toggles between paused and running states.
+void SimulationState::togglePaused() {
+    if (m_isPaused == true) {
+        m_isPaused = false;
+    } else {
+        m_isPaused = true;
+    }
+}
+
+bool SimulationState::isPaused() const {
+    return m_isPaused;
 }
 
 // Adds a unit to the internal unit list
