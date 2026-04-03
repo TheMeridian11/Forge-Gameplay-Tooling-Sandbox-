@@ -5,25 +5,26 @@
 SimulationState SimulationState::createSampleState() {
     SimulationState state;
 
+    // for now, we are starting units below max health so that regeneration is visible in the UI
     state.addUnit(Unit{
         1,
         "Knight",
         Team::Blue,
-        Stats{150, 150, 20}
+        Stats{150, 100, 20, 0.0f}
     });
 
     state.addUnit(Unit{
         2,
         "Mage",
         Team::Red,
-        Stats{200, 200, 40}
+        Stats{200, 150, 40, 0.0f}
     });
 
     state.addUnit(Unit{
         3,
         "Archer",
         Team::Blue,
-        Stats{100, 100, 15}
+        Stats{100, 60, 15, 0.0f}
     });
 
     return state;
@@ -37,9 +38,41 @@ void SimulationState::update(float deltaTimeSeconds) {
     if (m_isPaused == true) {
         return;
     }
-    
+
     ++m_tickCount;
     m_elapsedTimeSeconds += deltaTimeSeconds;
+
+    // Apply a very small passive health regeneration effect to each unit.
+    // This is my first example of per unit simulation behaviour.
+    // NOTE: the 'constexpr' is used for when you want to enable a variable
+    // (or a function) return values to be computed at compile time rather than runtime.
+    constexpr float health_regen_per_second = 5.0f;
+
+    // If already at max health, do nothing
+    // otherwise add fractional regen progress 
+    // once enough progress builds up, increase health by whole numbers.
+    for (Unit& unit : m_units) {
+        // Skip units that are already fully healed
+        if (unit.stats.current_health >= unit.stats.max_health) {
+            unit.stats.regeneration_progress = 0.0f;
+            continue;
+        }
+
+        // Accumulate fractional regeneration over time.
+        unit.stats.regeneration_progress += health_regen_per_second * deltaTimeSeconds;
+
+        // convert whole number regeneration progress into actual health.
+        while (unit.stats.regeneration_progress >= 1.0f && unit.stats.current_health < unit.stats.max_health) {
+            ++unit.stats.current_health;
+            unit.stats.regeneration_progress -= 1.0f;
+        }
+
+        // Clamp health to its maximum value.
+        if (unit.stats.current_health > unit.stats.max_health) {
+            unit.stats.current_health = unit.stats.max_health;
+            unit.stats.regeneration_progress = 0.0f;
+        }
+    }
 }
 
 // Pauses the simulation
