@@ -30,6 +30,7 @@ SimulationState SimulationState::createSampleState() {
     return state;
 }
 
+
 // Advances the simulation by one update step.
 // For now, this only tracks time and tick count and pausing support.
 // Later this function will also drive gameplay systems. 
@@ -39,6 +40,25 @@ void SimulationState::update(float deltaTimeSeconds) {
         return;
     }
 
+    applySimulationStep(deltaTimeSeconds);
+}
+
+// Advances the simulation by exactly one step, even if paused.
+void SimulationState::stepOnce(float deltaTimeSeconds) {
+    applySimulationStep(deltaTimeSeconds);
+}
+
+// Resets the simulation back to the original same setup
+void SimulationState::reset() {
+    // this line is basically us saying that, replace this current simulation object
+    // with a fresh new sample simulation
+    // NOTE: later, when the simulation setup becomes data driven, i may do something more advanced
+    // but this is perfect just for nows usage.
+    *this = SimulationState::createSampleState();
+}
+
+// Applies all per frame simulation behaviour.
+void SimulationState::applySimulationStep(float deltaTimeSeconds) {
     ++m_tickCount;
     m_elapsedTimeSeconds += deltaTimeSeconds;
 

@@ -35,6 +35,12 @@ class SimulationState {
     // (will be called from main.cpp every frame)
     void update(float deltaTimeSeconds);
 
+    // Advances the simulation by a single step, even if the simulation is paused.
+    void stepOnce(float deltaTimeSeconds);
+
+    // Reset the simulation back to its initial sample state.
+    void reset();
+
     // Pauses the simulation updates.
     void pause();
 
@@ -61,6 +67,10 @@ class SimulationState {
 
     // Returns the total elapsed simulation time in seconds.
     float getElapsedTimeSeconds() const;
+
+    private:
+    // Applies all per frame simulation logic.
+    void applySimulationStep(float deltaTimeSeconds);
 
     // m_units is private because it is the internal state of the class
     // we do not want outside code doing anything it wants directly to this vector.
