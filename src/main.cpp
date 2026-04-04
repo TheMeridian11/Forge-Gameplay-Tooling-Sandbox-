@@ -103,6 +103,9 @@ int main(int argc, char* argv[]) {
     // the frequency function tells us how many timer counts happen per second.
     const Uint64 frequency = SDL_GetPerformanceFrequency();
 
+    // Fixed single step size used for manual stepping while paused.
+    constexpr float manual_step_delta_time = 1.0f / 60.0f;
+
     bool running = true;
     // This is the loop that will be keeping our application alive, running every frame until 
     // the user closes the window.
@@ -154,6 +157,7 @@ int main(int argc, char* argv[]) {
         ImGui::Text("Elapsed Time: %.2f seconds", simulation_state.getElapsedTimeSeconds());
 
         ImGui::Spacing();
+        ImGui::Text("Simulation Controls");
 
         if (simulation_state.isPaused()) {
             if (ImGui::Button("Resume Simulation")) {
@@ -162,6 +166,18 @@ int main(int argc, char* argv[]) {
         } else {
             if (ImGui::Button("Pause Simulation")) {
                 simulation_state.pause();
+            }
+        }
+
+        // Allow resetting the simulation back to its initial state.
+        if (ImGui::Button("Reset Simulation")) {
+            simulation_state.reset();
+        }
+
+        // Allow advancing the simulation by exactly one fixed step while paused. 
+        if (simulation_state.isPaused()) {
+            if (ImGui::Button("Step Simulation")) {
+                simulation_state.stepOnce(manual_step_delta_time);
             }
         }
 
