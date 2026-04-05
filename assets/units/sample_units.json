@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "name": "Knight",
+        "team": "Blue",
+        "max_health": 150,
+        "current_health": 120,
+        "attack_power": 20
+    },
+    {
+        "id": 2,
+        "name": "Mage",
+        "team": "Red",
+        "max_health": 200,
+        "current_health": 160,
+        "attack_power": 40
+    },
+    {
+        "id": 3,
+        "name": "Archer",
+        "team": "Blue",
+        "max_health": 100,
+        "current_health": 70,
+        "attack_power": 15
+    }
+]
