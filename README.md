@@ -26,11 +26,15 @@ The project currently includes:
 - core gameplay data structures (`Stats`, `Unit`)
 - simulation state management
 - simulation tick and elapsed time tracking
+- JSON-based sample unit loading
+- validation and safer error handling for unit JSON content
+- centralized content path helper for data file locations
 - pause, resume, reset, and single-step simulation controls
 - passive per-unit health regeneration over time
 - dedicated simulation panel UI module
 - event/debug log for simulation actions
 - code formatting with clang-format
+
 
 ## Current Features
 

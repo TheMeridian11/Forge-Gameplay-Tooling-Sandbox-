@@ -3,13 +3,14 @@
 #include <stdexcept>
 
 #include "data/UnitLoader.h"
+#include "data/ContentPaths.h"
 
 // Creates a starter simulation by loading sample units from JSON data.
 SimulationState SimulationState::createSampleState() {
     SimulationState state;
 
     const std::vector<UnitTemplate> UnitTemplates = 
-        UnitLoader::loadUnitTemplatesFromFile("assets/units/sample_units.json");
+        UnitLoader::loadUnitTemplatesFromFile(ContentPaths::getSampleUnitsFilePath());
     
     for (const UnitTemplate& unitTemplate : UnitTemplates) {
         state.addUnit(createUnitFromTemplate(unitTemplate));
