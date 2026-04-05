@@ -45,6 +45,7 @@ set(IMGUI_SOURCES
 add_executable(forge_gameplay_tooling_sandbox
     src/main.cpp
     src/simulation/SimulationState.cpp
+    src/ui/SimulationPanel.cpp
     ${IMGUI_SOURCES}
 )
 

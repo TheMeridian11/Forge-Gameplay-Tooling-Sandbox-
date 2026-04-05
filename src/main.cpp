@@ -9,27 +9,8 @@
 #include "backends/imgui_impl_sdl2.h"
 #include "backends/imgui_impl_sdlrenderer2.h"
 #include "simulation/SimulationState.h"
+#include "ui/SimulationPanel.h"
 
-// PHASE 2
-// Converts a team enum value into readable text for the UI.
-const char* teamToString(Team team) {
-    switch (team) {
-        case Team::Blue:
-            return "Blue";
-        case Team::Red:
-            return "Red";
-        default:
-            return "Unknown";
-    }
-}
-
-// Converts pause state into readable text for the UI.
-const char* simulationStatusToString(bool isPaused) {
-    if (isPaused == true) {
-        return "Paused";
-    }
-    return "Running";
-}
 
 int main(int argc, char* argv[]) {
     // we silence warning when these parameters remain unused
@@ -135,7 +116,7 @@ int main(int argc, char* argv[]) {
         // so i thought it would be a good idea to start this right habit from now in development.  
         const float deltaTimeSeconds = static_cast<float>(counterElapsed) / static_cast<float>(frequency);
 
-        // Advance the simulation. 
+        // Advance the simulation normally when it is not paused
         simulation_state.update(deltaTimeSeconds);
 
         // Starting a new ImGui Frame
@@ -144,57 +125,26 @@ int main(int argc, char* argv[]) {
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
-        // Drawing a simple debug window
-        // ̶p̶a̶r̶t̶i̶c̶u̶l̶a̶r̶l̶y̶,̶ ̶w̶e̶ ̶a̶r̶e̶ ̶c̶r̶e̶a̶t̶i̶n̶g̶ ̶a̶ ̶l̶i̶t̶t̶l̶e̶ ̶U̶I̶ ̶p̶a̶n̶e̶l̶ ̶t̶h̶a̶t̶ ̶p̶r̶o̶v̶e̶s̶ ̶I̶m̶G̶u̶i̶ ̶i̶s̶ ̶r̶e̶n̶d̶e̶r̶i̶n̶g̶.̶
-        // This window will be showing the current simulation state.
-        ImGui::Begin("Simulation Overview");
-        ImGui::Text("week 2 setup: Core simulation foundation");
-        ImGui::Text("SDL2 window and Dear ImGui are running!");
-        ImGui::Separator();
-        ImGui::Text("Status: %s", simulationStatusToString(simulation_state.isPaused()));
-        ImGui::Text("Total Units: %zu",  simulation_state.getUnitCount());
-        ImGui::Text("Tick Count: %zu", simulation_state.getTickCount());
-        ImGui::Text("Elapsed Time: %.2f seconds", simulation_state.getElapsedTimeSeconds());
+        // Draw the simulation panel and collect any requested actions.
+        const SimulationPanelActions actions_panel = drawSimulationPanel(simulation_state);
 
-        ImGui::Spacing();
-        ImGui::Text("Simulation Controls");
-
-        if (simulation_state.isPaused()) {
-            if (ImGui::Button("Resume Simulation")) {
-                simulation_state.resume();
-            }
-        } else {
-            if (ImGui::Button("Pause Simulation")) {
-                simulation_state.pause();
-            }
+        if (actions_panel.requestPause == true) {
+            simulation_state.pause();
         }
 
-        // Allow resetting the simulation back to its initial state.
-        if (ImGui::Button("Reset Simulation")) {
+        if (actions_panel.requestResume == true) {
+            simulation_state.resume();
+        }
+
+        if (actions_panel.requestReset == true) {
             simulation_state.reset();
         }
 
-        // Allow advancing the simulation by exactly one fixed step while paused. 
-        if (simulation_state.isPaused()) {
-            if (ImGui::Button("Step Simulation")) {
-                simulation_state.stepOnce(manual_step_delta_time);
-            }
+        if (actions_panel.requestStep == true) {
+            simulation_state.stepOnce(manual_step_delta_time);
         }
 
-        const std::vector<Unit>& units = simulation_state.getUnits();
-
-        for (const Unit& unit : units) {
-            ImGui::Separator();
-            ImGui::Text("Unit ID: %d", unit.id);
-            ImGui::Text("Name: %s", unit.name.c_str());
-            ImGui::Text("Team: %s", teamToString(unit.team));
-            ImGui::Text("Health: %d / %d", unit.stats.current_health, unit.stats.max_health);
-            ImGui::Text("Attack Power: %d", unit.stats.attack_power);
-        }
-        //ImGui::Text("Next: smoke test and first successful build, lol memes");
-        ImGui::End();
-
-        // Now we actually render everything.
+        // Now we actually finalise and render the UI frame and everything else.
         ImGui::Render();
         // Finalise the imgui frame, clearing the screen to a dark colour, drawing the UI and presents
         // the frame to the window.
