@@ -1,5 +1,6 @@
 # Forge-Gameplay-Tooling-Sandbox-
-This is a C++ gameplay systems sandbox where units, abilities, and status effects are simulated in real time, with developer tooling for inspection, debugging, and rapid iteration.
+This is a C++ gameplay systems sandbox where units, abilities, and status effects are simulated in real time, with developer tooling for inspection, debugging, rapid iteration
+and clean software architecture.
 
 ## Overview
 
@@ -15,27 +16,43 @@ This project is being developed as a portfolio piece for myself to showcase my:
 
 ## Current Status
 
-Phase 1 of development foundation is complete.
+Phase 1 and 2 of development is complete.
 
 The project currently includes:
 - C++20 project setup with CMake
 - SDL2 window creation
 - Dear ImGui integration
-- a working application loop
 - Catch2 test setup
-- an initial smoke test (not actually testing smoke functionality but rather that the testing environment works)
+- core gameplay data structures (`Stats`, `Unit`)
+- simulation state management
+- simulation tick and elapsed time tracking
+- pause, resume, reset, and single-step simulation controls
+- passive per-unit health regeneration over time
+- dedicated simulation panel UI module
+- event/debug log for simulation actions
 - code formatting with clang-format
 
-## Planned Features
+## Current Features
 
-The project will later expand to include:
-- unit and ability definitions
-- combat simulation systems
-- cooldown and status effect logic
-- event logging
-- gameplay debugging tools
-- data-driven content loading using JSON
-- developer inspection panels for simulation state
+### Simulation
+- sample units are created in a starter simulation state
+- simulation updates over time using delta time
+- tick count and elapsed time are tracked
+- units regenerate health over time
+- simulation can be paused, resumed, reset, or stepped manually
+
+### Tooling / Debug UI
+- simulation overview panel
+- unit inspection readout
+- simulation controls
+- event/debug log showing recent actions
+
+## Planned Features for Next Phase
+Phase 3 will introduce data-driven loading so that simulation content is no longer hardcoded in C++. The next planned additions include:
+- JSON-defined unit data
+- data loading/parsing layer
+- validation of loaded content
+- moving sample simulation setup into external data files
 
 ## Tech Stack
 
@@ -46,6 +63,7 @@ The project will later expand to include:
 - **Data Format:** JSON using nlohmann/json
 - **Testing:** Catch2
 - **Formatting:** clang-format
+- **CI:** GitHub Actions
 
 ## Project Structure
 
@@ -55,8 +73,14 @@ The project will later expand to include:
 ├── docs/
 ├── external/
 ├── include/
+│   ├── gameplay/
+│   ├── simulation/
+│   └── ui/
 ├── src/
+│   ├── simulation/
+│   └── ui/
 ├── tests/
+├── .github/
 ├── CMakeLists.txt
 └── README.md
 ```
@@ -72,7 +96,7 @@ From the project root:
 > ctest --test-dir build --output-on-failure
 
 ## Notes:
-- The current version is an early foundation build.
+- The current version focuses on simulation foundations and debug tooling.
 - Gameplay systems have not been implemented yet.
-- The focus so far has been on creating a clean, professional starting point for future development.
+- The next phase will transition the project toward data-driven loading.
 
