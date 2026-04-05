@@ -10,13 +10,13 @@ SimulationState SimulationState::createSampleState() {
     SimulationState state;
 
     const std::vector<UnitTemplate> UnitTemplates = 
-        UnitLoader::loadUnitTemplatesFromFile(ContentPaths::getSampleUnitsFilePath());
+        UnitLoader::loadUnitTemplatesFromManifest(ContentPaths::getUnitManifestFilePath(), ContentPaths::getUnitsDirectory());
     
     for (const UnitTemplate& unitTemplate : UnitTemplates) {
         state.addUnit(createUnitFromTemplate(unitTemplate));
     }
     
-    state.logEvent("Simulation created from JSON unit data.");
+    state.logEvent("Simulation created from JSON manifest data.");
     return state;
 }
 

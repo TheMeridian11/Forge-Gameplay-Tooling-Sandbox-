@@ -40,6 +40,7 @@ The project currently includes:
 
 ### Simulation
 - sample units are created in a starter simulation state
+- unit content loaded from multiple JSON files via a manifest
 - simulation updates over time using delta time
 - tick count and elapsed time are tracked
 - units regenerate health over time

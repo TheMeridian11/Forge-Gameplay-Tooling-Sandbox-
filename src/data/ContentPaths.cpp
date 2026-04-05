@@ -11,6 +11,6 @@ std::string ContentPaths::getUnitsDirectory() {
 }
 
 // Returns the default sample unit data file path.
-std::string ContentPaths::getSampleUnitsFilePath() {
-    return getUnitsDirectory() + "/sample_units.json";
+std::string ContentPaths::getUnitManifestFilePath() {
+    return getUnitsDirectory() + "/unit_manifest.json";
 }

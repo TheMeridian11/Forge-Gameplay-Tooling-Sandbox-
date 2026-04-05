@@ -87,24 +87,62 @@ static void validateUnitEntry(const json& entry, std::size_t entryIndex) {
     }
 }
 
-// Loads unit templates from a JSON file on disk
-std::vector<UnitTemplate> UnitLoader::loadUnitTemplatesFromFile(const std::string& filePath) {
-    // Open the JSON file for reading.
+// Loads and validates a single unit file.
+// Since each file contains one unit object, we validate it as entry index 0.
+UnitTemplate UnitLoader::loadUnitTemplateFromFile(const std::string& filePath) {
     std::ifstream inputFile(filePath);
 
-    // If the file could not be opened, stop immediately with a clear error
     if (!inputFile.is_open()) {
         throw std::runtime_error("Failed to open unit data file: " + filePath);
     }
 
-    // This json object will hold the fully parsed contents of the file.
     json rootJson;
 
     try {
-        // Read and parse the file contents directly into the JSON object.
-        inputFile >> rootJson; 
+        inputFile >> rootJson;
     } catch (const json::parse_error& error) {
-        throw std::runtime_error("Failed to parse JSON in unit data file '" + filePath + "': " + error.what());
+        throw std::runtime_error("Failed parse JSON in unit data file '" + filePath + "': " + error.what());
+    }
+
+    // Validate the structure and values of the current entry before reading it.
+    // we use 0 because this file contains just one unit object, not an array of many.
+    validateUnitEntry(rootJson, 0);
+
+    UnitTemplate unitTemplate;
+    // Read each expected field from the JSON object.
+    //
+    // entry.at("fieldName") looks up a required field.
+    // If the field is missing, it throws an error.
+    //
+    // .get<Type>() converts the JSON value into the C++ type we want.
+    unitTemplate.id = rootJson.at("id").get<int>();
+    unitTemplate.name = rootJson.at("name").get<std::string>();
+    unitTemplate.team = rootJson.at("team").get<std::string>();
+    unitTemplate.max_health = rootJson.at("max_health").get<int>();
+    unitTemplate.current_health = rootJson.at("current_health").get<int>();
+    unitTemplate.attack_power = rootJson.at("attack_power").get<int>();
+    
+    return unitTemplate;
+}
+
+// Loads a manifest file and then loads each unit file listed inside it.
+std::vector<UnitTemplate> UnitLoader::loadUnitTemplatesFromManifest(const std::string& manifestFilePath, const std::string& unitsDirectory) {
+    // Open the JSON file for reading.
+    std::ifstream inputFile(manifestFilePath);
+
+    // If the file could not be opened, stop immediately with a clear error
+    if (!inputFile.is_open()) {
+        throw std::runtime_error("Failed to open unit manifest file: " + manifestFilePath);
+    }
+
+    // This json object will hold the fully parsed contents of the file.
+    json manifestJson;
+
+    try {
+        // Read and parse the file contents directly into the JSON object.
+        inputFile >> manifestJson; 
+    } catch (const json::parse_error& error) {
+        throw std::runtime_error("Failed to parse JSON in unit manifest file '" + manifestFilePath + "': " + error.what());
     }
 
     // I expect the root of the JSON file to be an array, like: 
@@ -115,41 +153,29 @@ std::vector<UnitTemplate> UnitLoader::loadUnitTemplatesFromFile(const std::strin
     // ]
     // 
     // If the root is not an array, the file format is not what i expected duhhh.
-    if (!rootJson.is_array()) {
-        throw std::runtime_error("Unit data file must contain a JSON array: " + filePath);
+    if (!manifestJson.is_array()) {
+        throw std::runtime_error("Unit manifest file must contain a JSON array: " + manifestFilePath);
     }
 
     // This vector will store all loaded unit templates after parsing.
     std::vector<UnitTemplate> unitTemplates;
 
     // Loop through each JSON object in the array.
-    for (std::size_t index = 0; index < rootJson.size(); index++) {
-        const json& entry = rootJson.at(index);
+    for (std::size_t index = 0; index < manifestJson.size(); index++) {
+        const json& entry = manifestJson.at(index);
 
-        // Validate the structure and values of the current entry before reading it.
-        validateUnitEntry(entry, index);
+        if (!entry.is_string()) {
+            throw std::runtime_error("Manifest entry at index " + std::to_string(index) + " must be a string file name.");
+        }
 
-        UnitTemplate unitTemplate;
-
-        // Read each expected field from the JSON object.
-        //
-        // entry.at("fieldName") looks up a required field.
-        // If the field is missing, it throws an error.
-        //
-        // .get<Type>() converts the JSON value into the C++ type we want.
-        unitTemplate.id = entry.at("id").get<int>();
-        unitTemplate.name = entry.at("name").get<std::string>();
-        unitTemplate.team = entry.at("team").get<std::string>();
-        unitTemplate.max_health = entry.at("max_health").get<int>();
-        unitTemplate.current_health = entry.at("current_health").get<int>();
-        unitTemplate.attack_power = entry.at("attack_power").get<int>();
+        const std::string fileName = entry.get<std::string>();
+        const std::string filePath = unitsDirectory + "/" + fileName;
 
         // Add the fully parsed template into the result list.
-        unitTemplates.push_back(unitTemplate);
+        unitTemplates.push_back(loadUnitTemplateFromFile(filePath));
     }
 
     // Return all successfully loaded unit templates.
     return unitTemplates;
 
 }
-

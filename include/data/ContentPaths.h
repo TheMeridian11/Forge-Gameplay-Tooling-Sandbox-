@@ -12,6 +12,6 @@ class ContentPaths {
     // Returns the directory that contains unit data files.
     static std::string getUnitsDirectory();
 
-    // Returns the default sample unit data file path.
-    static std::string getSampleUnitsFilePath();
+    // Returns the unit manifest file path.
+    static std::string getUnitManifestFilePath();
 };
