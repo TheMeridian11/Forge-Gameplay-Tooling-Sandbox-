@@ -1,0 +1,8 @@
+{
+    "id": 2,
+    "name": "Mage",
+    "team": "Red",
+    "max_health": 200,
+    "current_health": 160,
+    "attack_power": 40
+}
