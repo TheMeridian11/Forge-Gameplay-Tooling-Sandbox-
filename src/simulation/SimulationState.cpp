@@ -1,36 +1,49 @@
 #include "simulation/SimulationState.h"
 
-// creates a starter simulation containing a few hardcoded example units.
-// Later, this setup will likely be replaced by JSON-driven content loading.
+#include <stdexcept>
+
+#include "data/UnitLoader.h"
+
+// Creates a starter simulation by loading sample units from JSON data.
 SimulationState SimulationState::createSampleState() {
     SimulationState state;
 
-    // for now, we are starting units below max health so that regeneration is visible in the UI
-    state.addUnit(Unit{
-        1,
-        "Knight",
-        Team::Blue,
-        Stats{150, 100, 20, 0.0f}
-    });
-
-    state.addUnit(Unit{
-        2,
-        "Mage",
-        Team::Red,
-        Stats{200, 150, 40, 0.0f}
-    });
-
-    state.addUnit(Unit{
-        3,
-        "Archer",
-        Team::Blue,
-        Stats{100, 60, 15, 0.0f}
-    });
-
-    state.logEvent("Simulation created with sample units");
+    const std::vector<UnitTemplate> UnitTemplates = 
+        UnitLoader::loadUnitTemplatesFromFile("assets/units/sample_units.json");
+    
+    for (const UnitTemplate& unitTemplate : UnitTemplates) {
+        state.addUnit(createUnitFromTemplate(unitTemplate));
+    }
+    
+    state.logEvent("Simulation created from JSON unit data.");
     return state;
 }
 
+// Converts a loaded data template into a runtime Unit object.
+Unit SimulationState::createUnitFromTemplate(const UnitTemplate& unitTemplate) {
+    Team team = Team::Blue;
+
+    if (unitTemplate.team == "Blue") {
+        team = Team::Blue;
+    } else if (unitTemplate.team == "Red") {
+        team = Team::Red;
+    } else {
+        throw std::runtime_error("Unknown team value in unit template: " + unitTemplate.team);
+    }
+
+    return Unit{
+        unitTemplate.id,
+        unitTemplate.name,
+        team,
+        Stats{
+            unitTemplate.max_health,
+            unitTemplate.current_health,
+            unitTemplate.attack_power,
+            0.0f
+        }
+    };
+
+}
 
 // Advances the simulation by one update step.
 // For now, this only tracks time and tick count and pausing support.

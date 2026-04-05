@@ -1,8 +1,10 @@
 #pragma once
 
 #include <cstddef>
+#include <string>
 #include <vector>
 
+#include "data/UnitTemplate.h"
 #include "gameplay/Unit.h"
 
 // following good OOP/Encapsulation, (public vs private)
@@ -18,12 +20,10 @@
 // (3) getUnits() const:
 // The member fucntion itself is read only with respect to the object 
 
-// PHASE 2 CONTINUATION:
-// this is a new system i want to introduce which is a tick system that updates system code with each frame
-
 
 // Holds the current state of the sandbox simulation
-// For phase 2, it mainly stores units and tracks basic simulation timing data. 
+// At this stage, it stores units, tracks timing data, and exposes
+// simple control/debug functionality for the sandbox. 
 class SimulationState {
     public:
 
@@ -71,6 +71,7 @@ class SimulationState {
     // Returns the total elapsed simulation time in seconds.
     float getElapsedTimeSeconds() const;
 
+    // (1) private functions
     private:
     // Applies all per frame simulation logic.
     void applySimulationStep(float deltaTimeSeconds);
@@ -78,6 +79,10 @@ class SimulationState {
     // Adds a text entry to the event log.
     void logEvent(const std::string& message);
 
+    // Converts a loaded unit template into runtime unit instance.
+    static Unit createUnitFromTemplate(const UnitTemplate& UnitTemplate);
+
+    // (2) private variables
     private:
     // m_units is private because it is the internal state of the class
     // we do not want outside code doing anything it wants directly to this vector.
