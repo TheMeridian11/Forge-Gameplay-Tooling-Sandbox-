@@ -59,6 +59,9 @@ class SimulationState {
     // Returns all units currently in the simulation.
     const std::vector<Unit>& getUnits() const;
 
+    // Returns the most recent event log entries as a read only view.
+    const std::vector<std::string>& getEventLog() const;
+
     // Returns the total number of units in the simulation.
     std::size_t getUnitCount() const;
 
@@ -72,10 +75,15 @@ class SimulationState {
     // Applies all per frame simulation logic.
     void applySimulationStep(float deltaTimeSeconds);
 
+    // Adds a text entry to the event log.
+    void logEvent(const std::string& message);
+
+    private:
     // m_units is private because it is the internal state of the class
     // we do not want outside code doing anything it wants directly to this vector.
-    private:
     std::vector<Unit> m_units;
+
+    std::vector<std::string> m_eventLog;
 
     // Counts how many update ticks have occured.
     // (how many updates have happened essentially)

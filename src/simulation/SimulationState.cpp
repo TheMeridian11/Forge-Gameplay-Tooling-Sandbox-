@@ -27,6 +27,7 @@ SimulationState SimulationState::createSampleState() {
         Stats{100, 60, 15, 0.0f}
     });
 
+    state.logEvent("Simulation created with sample units");
     return state;
 }
 
@@ -46,6 +47,7 @@ void SimulationState::update(float deltaTimeSeconds) {
 // Advances the simulation by exactly one step, even if paused.
 void SimulationState::stepOnce(float deltaTimeSeconds) {
     applySimulationStep(deltaTimeSeconds);
+    logEvent("Manual simulation step exectued.");
 }
 
 // Resets the simulation back to the original same setup
@@ -55,6 +57,7 @@ void SimulationState::reset() {
     // NOTE: later, when the simulation setup becomes data driven, i may do something more advanced
     // but this is perfect just for nows usage.
     *this = SimulationState::createSampleState();
+    logEvent("Simulation reset!");
 }
 
 // Applies all per frame simulation behaviour.
@@ -98,19 +101,23 @@ void SimulationState::applySimulationStep(float deltaTimeSeconds) {
 // Pauses the simulation
 void SimulationState::pause() {
     m_isPaused = true;
+    logEvent("Simulation is now paused!");
 }
 
 // Resume the simulation.
 void SimulationState::resume() {
     m_isPaused = false;
+    logEvent("Simulation has been resumed!");
 }
 
 // Toggles between paused and running states.
 void SimulationState::togglePaused() {
     if (m_isPaused == true) {
         m_isPaused = false;
+        logEvent("Simulation resumed!");
     } else {
         m_isPaused = true;
+        logEvent("Simulation paused");
     }
 }
 
@@ -128,6 +135,11 @@ const std::vector<Unit>& SimulationState::getUnits() const {
     return m_units;
 }
 
+// Returns the most recent event log entries.
+const std::vector<std::string>& SimulationState::getEventLog() const {
+    return m_eventLog;
+}
+
 // Returns the number of units currently stored in the simulation.
 std::size_t SimulationState::getUnitCount() const {
     return m_units.size();
@@ -143,3 +155,13 @@ float SimulationState::getElapsedTimeSeconds() const {
     return m_elapsedTimeSeconds;
 }
 
+// Adds an entry to the event log and trims it to a small recent history
+void SimulationState::logEvent(const std::string& message) {
+    constexpr std::size_t max_log_entries = 8;
+
+    m_eventLog.push_back(message);
+
+    if (m_eventLog.size() > max_log_entries) {
+        m_eventLog.erase(m_eventLog.begin());
+    }
+}
