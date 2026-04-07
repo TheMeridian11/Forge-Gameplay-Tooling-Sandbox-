@@ -92,13 +92,16 @@ static void validateUnitEntry(const json& entry, std::size_t entryIndex) {
 UnitTemplate UnitLoader::loadUnitTemplateFromFile(const std::string& filePath) {
     std::ifstream inputFile(filePath);
 
+    // If the file could not be opened, stop immediately with a clear error
     if (!inputFile.is_open()) {
         throw std::runtime_error("Failed to open unit data file: " + filePath);
     }
 
+    // This json object will hold the fully parsed contents of the file.    
     json rootJson;
 
     try {
+        // Read and parse the file contents directly into the JSON object.        
         inputFile >> rootJson;
     } catch (const json::parse_error& error) {
         throw std::runtime_error("Failed parse JSON in unit data file '" + filePath + "': " + error.what());
