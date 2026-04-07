@@ -1,0 +1,6 @@
+{
+    "id": "power_shot",
+    "name": "Power Shot",
+    "damage": 25,
+    "cooldownSeconds": 2.5
+}

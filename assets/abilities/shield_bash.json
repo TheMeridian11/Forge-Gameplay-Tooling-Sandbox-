@@ -1,0 +1,6 @@
+{
+    "id": "shield_bash",
+    "name": "Shield Bash",
+    "damage": 20,
+    "cooldownSeconds": 4.0
+}
