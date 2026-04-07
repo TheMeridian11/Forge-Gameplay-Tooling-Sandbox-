@@ -11,7 +11,10 @@ class ContentPaths {
 
     // Returns the directory that contains unit data files.
     static std::string getUnitsDirectory();
-
     // Returns the unit manifest file path.
     static std::string getUnitManifestFilePath();
+
+    // same as how the above unit functions work except its for abilities lol
+    static std::string getAbilitiesDirectory();
+    static std::string getAbilityManifestFilePath();
 };

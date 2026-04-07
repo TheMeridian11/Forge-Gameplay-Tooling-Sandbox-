@@ -14,3 +14,12 @@ std::string ContentPaths::getUnitsDirectory() {
 std::string ContentPaths::getUnitManifestFilePath() {
     return getUnitsDirectory() + "/unit_manifest.json";
 }
+
+//  below two functions work the same as the two unit ones except for abilities lol
+std::string ContentPaths::getAbilitiesDirectory() {
+    return getAssetsRoot() + "/abilities";
+}
+
+std::string ContentPaths::getAbilityManifestFilePath() {
+    return getAbilitiesDirectory() + "/ability_manifest.json";
+}
