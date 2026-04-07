@@ -1,17 +1,26 @@
 #include "simulation/SimulationState.h"
 
 #include <stdexcept>
+#include <unordered_set>
 
+#include "data/AbilityLoader.h"
 #include "data/UnitLoader.h"
 #include "data/ContentPaths.h"
 
-// Creates a starter simulation by loading sample units from JSON data.
+// Creates a starter simulation by loading sample units and abilities from JSON data.
 SimulationState SimulationState::createSampleState() {
     SimulationState state;
 
     const std::vector<UnitTemplate> UnitTemplates = 
         UnitLoader::loadUnitTemplatesFromManifest(ContentPaths::getUnitManifestFilePath(), ContentPaths::getUnitsDirectory());
     
+    const std::vector<AbilityTemplate> abilityTemplates = 
+        AbilityLoader::loadAbilityTemplatesFromManifest(ContentPaths::getAbilityManifestFilePath(), ContentPaths::getAbilitiesDirectory());
+
+    validateUnitAbilityReferences(UnitTemplates, abilityTemplates);
+
+    state.m_abilities = abilityTemplates;
+
     for (const UnitTemplate& unitTemplate : UnitTemplates) {
         state.addUnit(createUnitFromTemplate(unitTemplate));
     }
@@ -41,9 +50,27 @@ Unit SimulationState::createUnitFromTemplate(const UnitTemplate& unitTemplate) {
             unitTemplate.current_health,
             unitTemplate.attack_power,
             0.0f
-        }
+        },
+        unitTemplate.ability_IDs
     };
 
+}
+
+// Validates thaty every ability ID referenced by eahc unit exists in the loaded ability data
+void SimulationState::validateUnitAbilityReferences(const std::vector<UnitTemplate>& unitTemplates, const std::vector<AbilityTemplate>& abilityTemplates) {
+    std::unordered_set<std::string> validAbilityIDs;
+
+    for (const AbilityTemplate& abilityTemplate : abilityTemplates) {
+        validAbilityIDs.insert(abilityTemplate.id);
+    }
+
+    for (const UnitTemplate& unitTemplate : unitTemplates) {
+        for (const std::string& abilityId : unitTemplate.ability_IDs) {
+            if (validAbilityIDs.find(abilityId) == validAbilityIDs.end()) {
+                throw std::runtime_error("Unit '" + unitTemplate.name + "' references unknown ability id: " + abilityId);
+            }
+        }
+    }
 }
 
 // Advances the simulation by one update step.
@@ -147,6 +174,11 @@ void SimulationState::addUnit(const Unit& unit) {
 // Returns a read only reference to all units in the simulation
 const std::vector<Unit>& SimulationState::getUnits() const {
     return m_units;
+}
+
+// Returns all abilities currently "usable" in the simulation
+const std::vector<AbilityTemplate>& SimulationState::getAbilities() const {
+    return m_abilities;
 }
 
 // Returns the most recent event log entries.

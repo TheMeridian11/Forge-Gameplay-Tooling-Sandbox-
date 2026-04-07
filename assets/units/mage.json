@@ -4,5 +4,6 @@
     "team": "Red",
     "max_health": 200,
     "current_health": 160,
-    "attack_power": 40
+    "attack_power": 40,
+    "ability_IDs": ["fireball"]
 }

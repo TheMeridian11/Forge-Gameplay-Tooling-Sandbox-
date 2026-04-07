@@ -4,5 +4,6 @@
     "team": "Blue",
     "max_health": 100,
     "current_health": 70,
-    "attack_power": 15
+    "attack_power": 15,
+    "ability_IDs": ["power_shot"]
 }

@@ -4,5 +4,6 @@
     "team": "Blue",
     "max_health": 150,
     "current_health": 120,
-    "attack_power": 20
+    "attack_power": 20,
+    "ability_IDs": ["shield_bash"]
 }

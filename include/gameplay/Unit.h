@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "gameplay/Stats.h"
 
@@ -18,4 +19,5 @@ struct Unit {
     std::string name;
     Team team = Team::Blue;
     Stats stats;
+    std::vector<std::string> ability_IDs;
 };

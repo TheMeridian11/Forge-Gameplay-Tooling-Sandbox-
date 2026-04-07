@@ -41,6 +41,23 @@ static void validateStringField(const json& entry, const std::string& fieldName,
     }
 }
 
+// Validates that a field is an array of strings.
+static void validateStringArrayField(const json& entry, const std::string& fieldName, std::size_t entryIndex) {
+    validateRequiredField(entry, fieldName, entryIndex);
+
+    if (!entry.at(fieldName).is_array()) {
+        throw std::runtime_error("Field '" + fieldName + "' in unit entry at index " + std::to_string(entryIndex) + " must be an array.");
+    }
+
+    const json& valueArray = entry.at(fieldName);
+
+    for (std::size_t i = 0; i < valueArray.size(); ++i) {
+        if (!valueArray.at(i).is_string()) {
+            throw std::runtime_error("Field '" + fieldName + "' in unit entry at index " + std::to_string(entryIndex) + " must contain only strings.");
+        }
+    }
+}
+
 // Validates the full structure and contents of a unit JSON entry... this one is big lol! 
 static void validateUnitEntry(const json& entry, std::size_t entryIndex) {
     if (!entry.is_object()) {
@@ -54,6 +71,7 @@ static void validateUnitEntry(const json& entry, std::size_t entryIndex) {
     validateIntegerField(entry, "max_health", entryIndex);
     validateIntegerField(entry, "current_health", entryIndex);
     validateIntegerField(entry, "attack_power", entryIndex);
+    validateStringArrayField(entry, "ability_IDs", entryIndex);
 
     // Extract values after type validation so we can validate gameplay function/simulation unit rules. 
     const int id = entry.at("id").get<int>();
@@ -155,6 +173,7 @@ UnitTemplate UnitLoader::loadUnitTemplateFromFile(const std::string& filePath) {
     unitTemplate.max_health = rootJson.at("max_health").get<int>();
     unitTemplate.current_health = rootJson.at("current_health").get<int>();
     unitTemplate.attack_power = rootJson.at("attack_power").get<int>();
+    unitTemplate.ability_IDs = rootJson.at("ability_IDs").get<std::vector<std::string>>();
     
     return unitTemplate;
 }

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "data/AbilityTemplate.h"
 #include "data/UnitTemplate.h"
 #include "gameplay/Unit.h"
 
@@ -25,7 +26,7 @@
 // At this stage, it stores units, tracks timing data, and exposes
 // simple control/debug functionality for the sandbox. 
 class SimulationState {
-    public:
+public:
 
     // creates a starter simulation state with a few built in sample units.
     // This is useful during early development before JSON-driven loading exists.
@@ -59,6 +60,9 @@ class SimulationState {
     // Returns all units currently in the simulation.
     const std::vector<Unit>& getUnits() const;
 
+    // Returns all abilities currently "usable" in the simulation
+    const std::vector<AbilityTemplate>& getAbilities() const;
+
     // Returns the most recent event log entries as a read only view.
     const std::vector<std::string>& getEventLog() const;
 
@@ -71,8 +75,8 @@ class SimulationState {
     // Returns the total elapsed simulation time in seconds.
     float getElapsedTimeSeconds() const;
 
-    // (1) private functions
-    private:
+// (1) private functions
+private:
     // Applies all per frame simulation logic.
     void applySimulationStep(float deltaTimeSeconds);
 
@@ -82,11 +86,17 @@ class SimulationState {
     // Converts a loaded unit template into runtime unit instance.
     static Unit createUnitFromTemplate(const UnitTemplate& UnitTemplate);
 
-    // (2) private variables
-    private:
+    // Validates that every ability ID referenced by every unit exists
+    // in the loaded ability template set.
+    static void validateUnitAbilityReferences(const std::vector<UnitTemplate>& unitTemplates, const std::vector<AbilityTemplate>& abilityTemplates);
+
+// (2) private variables
+private:
     // m_units is private because it is the internal state of the class
     // we do not want outside code doing anything it wants directly to this vector.
     std::vector<Unit> m_units;
+
+    std::vector<AbilityTemplate> m_abilities;
 
     std::vector<std::string> m_eventLog;
 

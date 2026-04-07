@@ -1,5 +1,6 @@
 #include "ui/SimulationPanel.h"
 
+#include <string>
 #include <vector>
 
 #include "imgui.h"
@@ -34,11 +35,12 @@ SimulationPanelActions drawSimulationPanel(const SimulationState& simulation_sta
     // ̶p̶a̶r̶t̶i̶c̶u̶l̶a̶r̶l̶y̶,̶ ̶w̶e̶ ̶a̶r̶e̶ ̶c̶r̶e̶a̶t̶i̶n̶g̶ ̶a̶ ̶l̶i̶t̶t̶l̶e̶ ̶U̶I̶ ̶p̶a̶n̶e̶l̶ ̶t̶h̶a̶t̶ ̶p̶r̶o̶v̶e̶s̶ ̶I̶m̶G̶u̶i̶ ̶i̶s̶ ̶r̶e̶n̶d̶e̶r̶i̶n̶g̶.̶
     // This window will be showing the current simulation state.
     ImGui::Begin("Simulation Overview");
-    ImGui::Text("Phase 2: Core simulation foundation");
+    ImGui::Text("Phase 3: Data Driven Loading");
     ImGui::Separator();
 
     ImGui::Text("Status: %s", simulationStatusToString(simulation_state.isPaused()));
     ImGui::Text("Total Units: %zu", simulation_state.getUnitCount());
+    ImGui::Text("Loaded Abilities: %zu", simulation_state.getAbilities().size());
     ImGui::Text("Tick Count: %zu", simulation_state.getTickCount());
     ImGui::Text("Elapsed Time: %.2f seconds", simulation_state.getElapsedTimeSeconds());
 
@@ -79,6 +81,13 @@ SimulationPanelActions drawSimulationPanel(const SimulationState& simulation_sta
         ImGui::Text("Team: %s", teamToString(unit.team));
         ImGui::Text("Health: %d / %d", unit.stats.current_health, unit.stats.max_health);
         ImGui::Text("Attack Power: %d", unit.stats.attack_power);
+
+        if (!unit.ability_IDs.empty()) {
+            ImGui::Text("Abilities:");
+            for (const std::string& abilityID : unit.ability_IDs) {
+                ImGui::BulletText("%s", abilityID.c_str());
+            }
+        }
     }
 
     ImGui::Spacing();
