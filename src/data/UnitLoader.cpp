@@ -7,6 +7,8 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+// This is just to help quikcly track values we have already seen.
+#include <unordered_set>
 
 #include "nlohmann/json.hpp"
 
@@ -55,6 +57,7 @@ static void validateUnitEntry(const json& entry, std::size_t entryIndex) {
 
     // Extract values after type validation so we can validate gameplay function/simulation unit rules. 
     const int id = entry.at("id").get<int>();
+    const std::string name = entry.at("name").get<std::string>();
     const std::string team = entry.at("team").get<std::string>();
     const int max_health = entry.at("max_health").get<int>();
     const int current_health = entry.at("current_health").get<int>();
@@ -63,6 +66,10 @@ static void validateUnitEntry(const json& entry, std::size_t entryIndex) {
     // Validate sensible gameplay values.
     if (id < 0) {
         throw std::runtime_error("Field 'id' in unit entry at index " + std::to_string(entryIndex) + " cannot be negative.");
+    }
+
+    if (name.empty()) {
+        throw std::runtime_error("Field 'name' in unit entry at index " + std::to_string(entryIndex) + " cannot be empty");
     }
 
     if (team != "Blue" && team != "Red") {
@@ -84,6 +91,30 @@ static void validateUnitEntry(const json& entry, std::size_t entryIndex) {
     if (attack_power < 0) {
         throw std::runtime_error(
             "Field 'attack_power' in unit entry at index " + std::to_string(entryIndex) + " cannot be negative.");
+    }
+}
+
+// Validates the set of loaded unit templates after all files have been read.
+// These checks catch problems that only appear when looking at all units together.
+static void validateLoadedUnitTemplates(const std::vector<UnitTemplate>& unitTemplates) {
+    // The manifest should produce at least one loaded unit.
+    if (unitTemplates.empty()) {
+        throw std::runtime_error("Unit manifest did not produce any loaded unit templates.");
+    }
+
+    std::unordered_set<int> seen_IDs;
+    std::unordered_set<std::string> seen_names;
+
+    for (const UnitTemplate& unitTemplate : unitTemplates) {
+        // Ensure no duplicate unit ID's exist across different files.
+        if (!seen_IDs.insert(unitTemplate.id).second) {
+            throw std::runtime_error("Duplicate unit ID detected across loaded files: " + std::to_string(unitTemplate.id));
+        }
+
+        // Ensure no duplicate unit names exist across different files.
+        if (!seen_names.insert(unitTemplate.name).second) {
+            throw std::runtime_error("Duplicate unit name detected across loaded files: " + unitTemplate.name);
+        }
     }
 }
 
@@ -160,8 +191,14 @@ std::vector<UnitTemplate> UnitLoader::loadUnitTemplatesFromManifest(const std::s
         throw std::runtime_error("Unit manifest file must contain a JSON array: " + manifestFilePath);
     }
 
+    // Reject an empty manifest because it is almost certainly accidental and would otherwise produce a black simulation.
+    if (manifestJson.empty()) {
+        throw std::runtime_error("Unit manifest file cannot be empty: " + manifestFilePath);
+    }
+
     // This vector will store all loaded unit templates after parsing.
     std::vector<UnitTemplate> unitTemplates;
+    std::unordered_set<std::string> seen_file_names;
 
     // Loop through each JSON object in the array.
     for (std::size_t index = 0; index < manifestJson.size(); index++) {
@@ -172,11 +209,20 @@ std::vector<UnitTemplate> UnitLoader::loadUnitTemplatesFromManifest(const std::s
         }
 
         const std::string fileName = entry.get<std::string>();
+
+        // Reject duplicate file names inside the manifest.
+        if (!seen_file_names.insert(fileName).second) {
+            throw std::runtime_error("Duplicate file name found in unit manifest: " + fileName);
+        }
+
         const std::string filePath = unitsDirectory + "/" + fileName;
 
         // Add the fully parsed template into the result list.
         unitTemplates.push_back(loadUnitTemplateFromFile(filePath));
     }
+
+    // Validate the final set of loaded templates across all files.
+    validateLoadedUnitTemplates(unitTemplates);
 
     // Return all successfully loaded unit templates.
     return unitTemplates;
