@@ -73,6 +73,17 @@ void SimulationState::validateUnitAbilityReferences(const std::vector<UnitTempla
     }
 }
 
+// Finds an ability by ID and returns a nullptr if not found.
+const AbilityTemplate* SimulationState::findAbilityById(const std::string& abilityID) const {
+    for (const AbilityTemplate& ability : m_abilities) {
+        if (ability.id == abilityID) {
+            return &ability;
+        }
+    }
+
+    return nullptr;
+}
+
 // Advances the simulation by one update step.
 // For now, this only tracks time and tick count and pausing support.
 // Later this function will also drive gameplay systems. 

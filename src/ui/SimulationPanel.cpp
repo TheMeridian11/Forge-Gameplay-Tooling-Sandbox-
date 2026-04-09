@@ -85,7 +85,22 @@ SimulationPanelActions drawSimulationPanel(const SimulationState& simulation_sta
         if (!unit.ability_IDs.empty()) {
             ImGui::Text("Abilities:");
             for (const std::string& abilityID : unit.ability_IDs) {
-                ImGui::BulletText("%s", abilityID.c_str());
+                const AbilityTemplate* ability = simulation_state.findAbilityById(abilityID);
+
+                if (ability != nullptr) {
+                    ImGui::BulletText(
+                        "%s (ID: %s, Damage: %d, Cooldown: %.1f, Range: %.1f)",
+                        ability->name.c_str(),
+                        ability->id.c_str(),
+                        ability->damage,
+                        ability->cooldownSeconds,
+                        ability->range
+                    );
+
+                    ImGui::TextWrapped("  %s", ability->description.c_str());
+                } else {
+                    ImGui::BulletText("Unknown ability: %s", abilityID.c_str());
+                }
             }
         }
     }

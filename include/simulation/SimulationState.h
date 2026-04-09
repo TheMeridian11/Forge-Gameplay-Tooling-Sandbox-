@@ -75,6 +75,9 @@ public:
     // Returns the total elapsed simulation time in seconds.
     float getElapsedTimeSeconds() const;
 
+    // Looks up an ability by ID and returns nullptr if it is not found.
+    const AbilityTemplate* findAbilityById(const std::string& abilityID) const;
+
 // (1) private functions
 private:
     // Applies all per frame simulation logic.
