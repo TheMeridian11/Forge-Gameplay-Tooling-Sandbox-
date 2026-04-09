@@ -2,5 +2,7 @@
     "id": "fireball",
     "name": "Fireball",
     "damage": 35,
-    "cooldownSeconds": 3.0
+    "cooldownSeconds": 3.0,
+    "range": 8.0,
+    "description": "Launches a fireball at the target."
 }

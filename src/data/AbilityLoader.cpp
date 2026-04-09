@@ -60,12 +60,16 @@ static void validateAbilityEntry(const json& entry, std::size_t entryIndex) {
     validateStringField(entry, "name", entryIndex);
     validateIntegerField(entry, "damage", entryIndex);
     validateNumberField(entry, "cooldownSeconds", entryIndex);
+    validateNumberField(entry, "range", entryIndex);
+    validateStringField(entry, "description", entryIndex);
 
     // Extract values after type validation so we can validate gameplay function/simulation ability rules.
     const std::string id = entry.at("id").get<std::string>();
     const std::string name = entry.at("name").get<std::string>();
     const int damage = entry.at("damage").get<int>();
     const float cooldownSeconds = entry.at("cooldownSeconds").get<float>();
+    const float range = entry.at("range").get<float>();
+    const std::string description = entry.at("description").get<std::string>();
 
     // Validate sensible gameplay values.
     if (id.empty()) {
@@ -85,6 +89,14 @@ static void validateAbilityEntry(const json& entry, std::size_t entryIndex) {
 
     if (cooldownSeconds < 0.0f) {
         throw std::runtime_error("Field 'cooldownSeconds' in ability entry at index " + std::to_string(entryIndex) + " cannot be negative.");
+    }
+
+    if (range < 0.0f) {
+        throw std::runtime_error("Field 'range' in ability entry at index " + std::to_string(entryIndex) + " cannot be negative.");
+    }
+
+    if (description.empty()) {
+        throw std::runtime_error("Field 'description' in ability entry at index " + std::to_string(entryIndex) + " cannot be empty");
     }
 }
 
@@ -146,6 +158,8 @@ AbilityTemplate AbilityLoader::loadAbilityTemplateFromFile(const std::string& fi
     abilityTemplate.name = rootJson.at("name").get<std::string>();
     abilityTemplate.damage = rootJson.at("damage").get<int>();
     abilityTemplate.cooldownSeconds = rootJson.at("cooldownSeconds").get<float>();
+    abilityTemplate.range = rootJson.at("range").get<float>();
+    abilityTemplate.description = rootJson.at("description").get<std::string>();
 
     return abilityTemplate;
 }

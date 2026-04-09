@@ -8,4 +8,6 @@ struct AbilityTemplate {
     std::string name;
     int damage = 0;
     float cooldownSeconds = 0.0f;
+    float range = 0.0f;
+    std::string description;
 };

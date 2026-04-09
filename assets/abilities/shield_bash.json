@@ -2,5 +2,7 @@
     "id": "shield_bash",
     "name": "Shield Bash",
     "damage": 20,
-    "cooldownSeconds": 4.0
+    "cooldownSeconds": 4.0,
+    "range": 2.0,
+    "description": "A close range shield strike."
 }

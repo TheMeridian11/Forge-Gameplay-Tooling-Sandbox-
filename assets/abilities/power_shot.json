@@ -2,5 +2,7 @@
     "id": "power_shot",
     "name": "Power Shot",
     "damage": 25,
-    "cooldownSeconds": 2.5
+    "cooldownSeconds": 2.5,
+    "range": 15.0,
+    "description": "Fires a powerful long range shot."
 }
